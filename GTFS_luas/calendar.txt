@@ -1,0 +1,5 @@
+service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+93,1,1,1,1,1,0,0,20240408,20241129
+94,0,0,0,0,0,1,0,20240406,20241130
+95,0,0,0,0,1,0,0,20240412,20241129
+96,1,1,1,1,1,0,1,20240407,20241201
