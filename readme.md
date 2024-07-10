@@ -6,4 +6,9 @@ To use it from an external point of view, the fonction to call is in the file
 
 ## Overview of the algorithm
 
-![Overview of the algorithm](readme_assets/algo_journey_checking.svg)
+<center>
+![Overview of the algorithm](
+    readme_assets/algo_journey_checking.svg,
+    "200 pixels wide, 200 pixels tall"
+)
+</center>
