@@ -144,12 +144,11 @@ def check_journey(journey:my_util.Journey, verbose=False):
 
 
 def analyse_journey(journey_file_path):
-
     journey = my_util.Journey(journey_file_path)
     list_checked_modes, list_checked_inter_trips = check_journey(journey, True)
-    result = all(list_checked_modes, list_checked_inter_trips)
+    combined_list = list_checked_modes + list_checked_inter_trips
+    result = all(combined_list)
     return result
-
 
 if __name__ == "__main__":
     trip_folder = "../trip_data/2024/"
