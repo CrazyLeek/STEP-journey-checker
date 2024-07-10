@@ -39,6 +39,13 @@ def check_journey(journey:my_util.Journey, verbose=False):
         journey.journey_modes, journey.gps_data, verbose
     )
 
+    if verbose:
+        print("Checking that every mode of transport has been found...")
+
+    for trip_detected in trips_detected:
+        if not trip_detected.has_a_valid_trip():
+            return (False, ), (False, )
+
     if verbose: print("\n\n--- CHECKING EACH TRIP ---")
     for i, trip_detected in enumerate(trips_detected):
             
