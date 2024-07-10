@@ -1,3 +1,9 @@
+img[src*='#center'] { 
+    display: block;
+    margin: auto;
+}
+
+
 # Home of the algorithm to check users' journeys
 
 To use it from an external point of view, the fonction to call is in the file 
