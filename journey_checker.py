@@ -16,7 +16,7 @@ given the best results so we'll use it.
 """
 
 
-import multi_modal
+from . import multi_modal
 import useful_things as my_util
 import other_detection.bayesian.walk_bike_checking as bayes
 
@@ -136,7 +136,12 @@ def check_journey(journey:my_util.Journey, verbose=False):
     return list_checked_modes, list_checked_inter_trips
 
 
+def analyse_journey(journey_file_path):
 
+    journey = my_util.Journey(journey_file_path)
+    list_checked_modes, list_checked_inter_trips = check_journey(journey, True)
+    result = all(list_checked_modes, list_checked_inter_trips)
+    return result
 
 
 if __name__ == "__main__":
