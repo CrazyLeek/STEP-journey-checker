@@ -20,10 +20,12 @@ only tricky case is when having two consecutive private transports such as
 car -> walk. This last case is not handled currently.
 """
 
-
+import itertools
+import math
 
 import useful_things as my_util # type:ignore
-import public_transport_detection.public_transport_checking as ptc # type:ignore
+import public_transport_detection.public_transport_checking as ptc 
+import other_detection.bayesian.walk_bike_checking as bayesian
 
 class PrivateTripDetected():
     """Store information about a private trip"""
@@ -46,6 +48,7 @@ class MultiModalDetection:
     def __init__(self, all_gtfs_data:dict=None):
 
         self.public_trip_detector = ptc.PublicTripDetector()
+        self.bayesian_checker     = bayesian.BayesianChecker()
         if all_gtfs_data is not None:
             self.public_trip_detector.all_gtfs_data
 
@@ -143,7 +146,6 @@ class MultiModalDetection:
                 print(f"{direction} trip is private, ", end="")
 
         
-
     def multi_modal_detection(self, journey, gps_data, verbose=False):
         """Try to detect a multi-modal trip"""
 
@@ -212,6 +214,89 @@ class MultiModalDetection:
                     print(f"{self.trips_detected[i].gps_index_start} to ", end="")
                     print(f"{self.trips_detected[i].gps_index_end}")
 
+
+        if verbose: print("--- THIRD ROUND ---")
+        speeds = my_util.calc_speed(gps_data)
+        i = 0
+        nb_trips = len(journey)
+        while i < nb_trips:
+            
+            consecutive_private_trips = 0
+            while i < nb_trips and journey[i][0] in ("walk", "bike", "car") :
+                consecutive_private_trips += 1
+                i += 1
+
+            if consecutive_private_trips >= 2:
+                start = i - consecutive_private_trips
+                end   = i - 1
+
+                if verbose:
+                    print(f"\t- {end - start + 1} consecutive private ", end="")
+                    print(f"trips detected from position {start} to {end}")
+
+                separations = itertools.combinations(
+                    range(
+                        self.trips_detected[start].gps_index_start + 10, 
+                        self.trips_detected[end].gps_index_end,
+                        30
+                    ),
+                    consecutive_private_trips - 1
+                )
+                
+                best_separation = (0.0, [])
+                for separation in separations:
+                    sorted(separation)
+                    trips_test = []
+
+                    trips_test.append(
+                        (
+                            self.trips_detected[start].gps_index_start, 
+                            separation[0]
+                        )
+                    )
+                    for j in range(consecutive_private_trips - 2):
+                        trips_test.append(
+                            (separation[j], separation[j + 1])
+                        )
+
+                    trips_test.append(
+                        (
+                            separation[-1], 
+                            self.trips_detected[end].gps_index_end
+                        )
+                    )
+
+                    probability = 1.0
+                    for j, (trip_start, trip_end) in \
+                        zip(range(start, end + 1), trips_test):
+
+                        p = self.bayesian_checker.calc_probabilities(
+                            speeds[ trip_start : trip_end ]
+                        )
+
+                        if   journey[j][0] == "walk": probability *= p[0]
+                        elif journey[j][0] == "bike": probability *= p[1]
+                        elif journey[j][0] == "car" : probability *= p[2]
+                        else: print(f"Unknown mode : {journey[j][0]}")
+
+                    if probability > best_separation[0]:
+                        best_separation = (probability, trips_test)
+
+
+                if verbose:
+                    print(f"\t  Best proba found : {best_separation[0]}")
+
+                for j, (trip_start, trip_end) in \
+                    zip(range(start, end + 1), best_separation[1]):
+
+                    self.trips_detected[j].gps_index_start = trip_start
+                    self.trips_detected[j].gps_index_end   = trip_end
+
+                    if verbose:
+                        print(f"\t  {journey[j][0]} : {trip_start} to {trip_end}")
+                        
+            i += 1
+
         return self.trips_detected     
 
 
@@ -223,9 +308,20 @@ def test_multi_modal_detection():
 
     mmd = MultiModalDetection()
 
-    folder = "../trip_data/migrated_data/"
+    folder = "../trip_data/2024/"
+    file = folder + "bike_walk_bike#07-04.json"
 
-    for file in my_util.FileIterator(folder, show_progress=False):
+    journey = my_util.Journey(file)
+
+    print(f"Analysing {file} ({journey.gps_data.shape[0]} points): ")
+
+    mmd.multi_modal_detection(
+        journey.journey_modes, 
+        journey.gps_data,
+        True
+    )
+
+    """for file in my_util.FileIterator(folder, show_progress=False):
 
         journey = my_util.Journey(file)
 
@@ -237,7 +333,7 @@ def test_multi_modal_detection():
             True
         )
 
-        print("\n")
+        print("\n")"""
 
 
 if __name__ == '__main__':
