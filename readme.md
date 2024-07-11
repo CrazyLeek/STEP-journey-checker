@@ -2,7 +2,7 @@
 # Home of the algorithm to check users' journeys
 
 To use it from an external point of view, the fonction to call is in the file 
-'journey_checker.py' and is named 'check_journey'
+`journey_checker.py` and is named `check_journey`
 
 
 ## Overview of the algorithm
@@ -19,22 +19,36 @@ The algorithm takes as input a list of GPS coordinates (time, longitude,
 latitude) and a list of mode of transports stated by the user such as ('walk', 
 'bus 1', 'bus 2').
 
-The algorithm is divided in three parts :
-1. Multimodal journey detection: as a journey can be composed of several mode 
+It is divided in three parts :
+1. **Multimodal journey detection**: as a journey can be composed of several mode 
   of transports, each part has to be identified
 
-2. Trip checking: once each trip has been identified in step 1, they are 
+2. **Trip checking**: once each trip has been identified in step 1, they are 
   verified
 
-3. Check inter trips: points between two modes of transport (particularly 
-  between two modes of public transports when users are supposed to walk and 
-  this mode isn't explicitly declared by them) are checked assuming they can 
-  only be walk
+3. **Check inter trips**: points between two modes of transport are checked 
+  assuming they can only be walk (particularly between two public transports 
+  when users are supposed to walk and this mode isn't explicitly declared by 
+  them)
 
 ![Overview of the algorithm](readme_assets/algo_journey_checking.svg#center)
 
-The algorithm use to main features :
+The algorithm use two main features :
 - a classification algorithm : two methods were tested (a bayesian and a machine 
   learning method). Currently, the method used is the bayesian one.
 - a public transport search : we use data issued by the city of Dublin to 
   verify that commuters' points match public routes.
+
+
+## Main data structures
+
+- Modes of transport :  
+  Users have to say what modes of transport they are going to use. To store 
+  this information, we use a list of pairs of values. Each pair represent a 
+  mode of transport. The first element is a string contining the mode (e.g. 
+  `'bus'` or `'bike'`) and the second one is the name of the route when the 
+  mode is public. When the mode isn't public, the value has no importance (but 
+  need to exist) and is usually `None` or `""`. For example, if users are 
+  starting their journey by foot, then take a bus whose name is '4A' and 
+  finish using a tramay (luas in Dublin) whose name is 'Green' then the modes 
+  will be stored like that: `[('walk', None), ('bus', '4A'), ('luas', 'Green')]`
