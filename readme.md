@@ -63,3 +63,6 @@ The algorithm use two main features :
 - **Journey**:
   When stored in a file, a journey is a json file. The main difference with the 
   loaded in memory version is that the GPS data is a `pandas.DataFrame`
+
+## GTFS dataset
+Public transport data follows the GTFS format, see [GTFS format](https://gtfs.org/schedule/)
