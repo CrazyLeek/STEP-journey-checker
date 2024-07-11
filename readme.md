@@ -70,3 +70,17 @@ Each mode of transport has it's own dataset. The most up to date data for Dublin
 can be downloaded [here](https://www.transportforireland.ie/transitData/PT_Data.html).
 There are also websites which provide a centralized collection of dataset from 
 all the world such as [this one](https://busmaps.com/).
+
+## Description of the files
+- `GTFS_Dublin_Bus`, `GTFS_luas` and `GTFS_rail` folders contain the GTFS data 
+  to search for public transports and the code is in the `public_transport_detection`
+
+- `other_detection` contains two classification methods corresponding to the 
+  two sub-folders `bayesian` and `machine_learning`
+
+- `journey_checker.py` contains the overall algorithm
+
+- `multi_modal.py` handle the separation of a multi-modal journey
+
+- `useful_things.py` includes objets used by all other components like classes
+  to handle GTFS data or a journey.
