@@ -31,7 +31,7 @@ It is divided in three parts :
   when users are supposed to walk and this mode isn't explicitly declared by 
   them)
 
-![Overview of the algorithm](readme_assets/algo_journey_checking.svg#center)
+![Overview of the algorithm](readme_assets/algo_journey_checking.svg)
 
 The algorithm use two main features :
 - a classification algorithm : two methods were tested (a bayesian and a machine 
@@ -42,13 +42,24 @@ The algorithm use two main features :
 
 ## Main data structures
 
-- Modes of transport :  
+- **Modes of transport**:  
   Users have to say what modes of transport they are going to use. To store 
   this information, we use a list of pairs of values. Each pair represent a 
-  mode of transport. The first element is a string contining the mode (e.g. 
+  mode of transport. The first element is a string containing the mode (e.g. 
   `'bus'` or `'bike'`) and the second one is the name of the route when the 
   mode is public. When the mode isn't public, the value has no importance (but 
   need to exist) and is usually `None` or `""`. For example, if users are 
   starting their journey by foot, then take a bus whose name is '4A' and 
   finish using a tramay (luas in Dublin) whose name is 'Green' then the modes 
   will be stored like that: `[('walk', None), ('bus', '4A'), ('luas', 'Green')]`
+
+- **GPS records**:
+  A GPS record, when saved in a file, is a field of three elements: the date of 
+  the record in ISO format, the longitude in decimal and the latitude in 
+  decimal. In Python, it's a tuple of `(str, float, float)`. Example 
+  `("2022-01-19T16:35:50.935Z", -7.2364775, 52.9556583)`. The function used to 
+  read the date is `datetime.fromisoformat` when the data is loaded.
+
+- **Journey**:
+  When stored in a file, a journey is a json file. The main difference with the 
+  loaded in memory version is that the GPS data is a `pandas.DataFrame`
