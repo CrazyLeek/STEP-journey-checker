@@ -66,5 +66,7 @@ The algorithm use two main features :
 
 ## GTFS datasets
 Public transport data follows the [GTFS Format](https://gtfs.org/schedule/). 
-Each mode of transport has it's own dataset. The most up to date data can be 
-downloaded [here](https://www.transportforireland.ie/transitData/PT_Data.html).
+Each mode of transport has it's own dataset. The most up to date data for Dublin 
+can be downloaded [here](https://www.transportforireland.ie/transitData/PT_Data.html).
+There are also websites which provide a centralized collection of dataset from 
+all the world such as [this one](https://busmaps.com/).
