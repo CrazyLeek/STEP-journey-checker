@@ -64,5 +64,7 @@ The algorithm use two main features :
   When stored in a file, a journey is a json file. The main difference with the 
   loaded in memory version is that the GPS data is a `pandas.DataFrame`
 
-## GTFS dataset
-Public transport data follows the GTFS format, see [GTFS format](https://gtfs.org/schedule/)
+## GTFS datasets
+Public transport data follows the [GTFS Format](https://gtfs.org/schedule/). 
+Each mode of transport has it's own dataset. The most up to date data can be 
+downloaded [here](https://www.transportforireland.ie/transitData/PT_Data.html).
