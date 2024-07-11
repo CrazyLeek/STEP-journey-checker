@@ -17,13 +17,13 @@ we can simply figure out where the car where taken, it's just the part before
 the bus. The same applies with more complex journeys like bus1 -> bus2 -> 
 walk -> dart. The walking part is between the bus and dart parts. Hence, the 
 only tricky case is when having two consecutive private transports such as
-car -> walk. This last case is not handled currently.
+car -> walk. To manage this case we test all possibilities of split and we keep 
+the best.
 """
 
 import itertools
-import math
 
-import useful_things as my_util # type:ignore
+import useful_things as my_util 
 import public_transport_detection.public_transport_checking as ptc 
 import other_detection.bayesian.walk_bike_checking as bayesian
 
@@ -32,8 +32,8 @@ class PrivateTripDetected():
 
     def __init__(self):
 
-        self.gps_index_start = None
-        self.gps_index_end   = None
+        self.gps_index_start:int = None
+        self.gps_index_end:int   = None
 
     def has_a_valid_trip(self) -> bool:
         """Return true if a trip has been identified"""
@@ -57,7 +57,14 @@ class MultiModalDetection:
         self.journey = []
         self.trips_detected = []
 
-    def public_transport_detection(self, trip_info):
+    def public_transport_detection(self, trip_info) -> ptc.PublicTripDetected:
+        """
+        Call the method to find a public route and print the result if the 
+        verbose mode is active
+
+        Return:
+            a PublicTripDetected object with all information needed
+        """
 
         mode = trip_info[0]
 
@@ -87,7 +94,7 @@ class MultiModalDetection:
         return trip_found
 
 
-    def deduce_point_from_previous_trip(self, trip_index):
+    def deduce_point_from_previous_trip(self, trip_index) -> int:
         """
         Copy the end point of a previous trip and put the number plus one in 
         the start point the next trip
@@ -96,24 +103,24 @@ class MultiModalDetection:
         split = self.trips_detected[trip_index - 1].gps_index_end + 1
         self.trips_detected[trip_index ].gps_index_start = split
 
-        return split
+        return split # the value is only retuned to display it
 
-    def deduce_point_from_next_trip(self, trip_index):
+    def deduce_point_from_next_trip(self, trip_index) -> int:
         """
-        Copy the start point of a next trip and put the number minus one in 
-        the start point the previous trip
+        Copy the start point of a next trip and put this number minus one in 
+        the end point the previous trip
         """
 
         split = self.trips_detected[trip_index + 1].gps_index_start - 1
         self.trips_detected[trip_index ].gps_index_end = split
 
-        return split
+        return split # the value is only retuned to display it
         
 
-    def look_side_trip(self, trip_index, direction):
+    def look_side_trip(self, trip_index, direction) -> None:
         """
         Examine the next or previous trip in order to deduce the starting or 
-        ending of a private trip
+        ending point of a private trip
         """
 
         if direction == "previous":
@@ -147,7 +154,18 @@ class MultiModalDetection:
 
         
     def multi_modal_detection(self, journey, gps_data, verbose=False):
-        """Try to detect a multi-modal trip"""
+        """
+        Try to detect a multi-modal trip
+        Arguments:
+            - journey: the list of transport modes
+            - gps_data: dataframe of GPS data
+            - verbose: boolean to print or not what the algorithm is doing
+                       precisely
+
+        Return:
+            a list of PrivateTripDetected or PublicTripDetected for each mode 
+            of transport
+        """
 
         self.verbose  = verbose
         self.journey  = journey
@@ -302,7 +320,7 @@ class MultiModalDetection:
 
 def test_multi_modal_detection():
     """
-    Read all the trips containing a public transport an try to find the stops
+    Read all the trips containing a public transport and try to find the stops
     taken.
     """
 
