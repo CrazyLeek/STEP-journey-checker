@@ -15,8 +15,9 @@ a car since we don't need to check that. For now, the bayesian method has
 given the best results so we'll use it. 
 """
 
+try:         from . import multi_modal
+except ImportError: import multi_modal
 
-from . import multi_modal
 import useful_things as my_util
 import other_detection.bayesian.walk_bike_checking as bayes
 
@@ -140,15 +141,26 @@ def check_journey(journey:my_util.Journey, verbose=False):
 
         list_checked_inter_trips.append(checked)
 
-    return list_checked_modes, list_checked_inter_trips
+    return list_checked_modes, list_checked_inter_trips, trips_detected
 
 
-def analyse_journey(journey_file_path):
+def analyse_journey(journey_file_path) -> tuple[bool, dict]:
+    """
+    Return relevant informations about the trip i.e if the journey is checked 
+    and the distance travelled for each mode
+    """
     journey = my_util.Journey(journey_file_path)
-    list_checked_modes, list_checked_inter_trips = check_journey(journey, True)
-    combined_list = list_checked_modes + list_checked_inter_trips
-    result = all(combined_list)
-    return result
+
+    list_checked_modes, list_checked_inter_trips, trips_detected = check_journey(journey, True)
+
+    journey_checked   = all(list_checked_modes + list_checked_inter_trips)
+    distance_by_modes = my_util.calc_distance_by_mode(
+        journey.gps_data, 
+        journey.journey_modes, 
+        trips_detected
+    )
+
+    return journey_checked, distance_by_modes
 
 if __name__ == "__main__":
     trip_folder = "../trip_data/2024/"
@@ -156,4 +168,10 @@ if __name__ == "__main__":
     journey = my_util.Journey(trip_folder + "bus-16_luas-Red#9-06.json")
 
     print(check_journey(journey, True))
+
+
+    for file in my_util.FileIterator(trip_folder, show_progress=False):
+        verification = check_journey(my_util.Journey(file), True)
+        print(f"Final result : {verification}")
+        print("\n" + '-'*100 + "\n")
 

@@ -130,6 +130,8 @@ class Trip:
             line = ""
 
         return self.mode + line
+    
+
 class Journey:
     """Store a journey loaded from a file"""
 
@@ -400,6 +402,54 @@ def calc_trip_time(df:pd.DataFrame):
 
     return (end_time - start_time).total_seconds() / 3600
 
+
+def calc_distance(df:pd.DataFrame) -> float:
+    """
+    Return the distance of a list of point
+
+    df: a dataframe containing data about a trip
+    """
+
+    old_lat, old_lon = None, None
+    distance = 0.0
+    
+    for _, rows in df.iterrows():
+
+        lat, lon = rows["latitude"], rows["longitude"]
+
+        if old_lat is not None:
+            distance += gps_distance(old_lat, old_lon, lat, lon)
+
+        old_lat, old_lon = lat, lon
+
+    return distance
+
+def calc_distance_by_mode(df, mode_list, detection) -> dict:
+    """
+    Return the distance travelled for each mode of transport.
+    
+    df: the data about the trip
+    mode_list: the list of mode of transports about the trip
+    detection: the list of detected mode of transports
+    
+    For instance, if mode_list = (("walk", ""), ("bus", "1") ,("walk", "")), 
+    the result will have this shape : {"walk": 1045.3, "bus": 5565.2}
+    """
+
+    res = {}
+
+    for mode, detected in zip(mode_list, detection):
+
+        mode_name = mode[0]
+
+        if mode_name not in res:
+            res[mode_name] = 0
+
+        res[mode_name] += calc_distance(
+            df.iloc[detected.gps_index_start, detected.gps_index_end]
+        )
+
+    return res
 
 
 def get_available_lines(gtfs_data:GtfsData):
