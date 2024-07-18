@@ -445,8 +445,10 @@ def calc_distance_by_mode(df, mode_list, detection) -> dict:
         if mode_name not in res:
             res[mode_name] = 0
 
+        print("df : ", df)
+        print("start, end : ", detected.gps_index_start, detected.gps_index_end)
         res[mode_name] += calc_distance(
-            df.iloc[detected.gps_index_start, detected.gps_index_end]
+            df.iloc[detected.gps_index_start: detected.gps_index_end]
         )
 
     return res
