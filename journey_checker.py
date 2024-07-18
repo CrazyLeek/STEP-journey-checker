@@ -45,7 +45,7 @@ def check_journey(journey:my_util.Journey, verbose=False):
 
     for trip_detected in trips_detected:
         if not trip_detected.has_a_valid_trip():
-            return (False, ), (False, )
+            return (False, ), (False, ), trip_detected
 
     if verbose: print("\n\n--- CHECKING EACH TRIP ---")
     for i, trip_detected in enumerate(trips_detected):
@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
 
     for file in my_util.FileIterator(trip_folder, show_progress=False):
-        verification = check_journey(my_util.Journey(file), True)
+        verification = analyse_journey(file) #(my_util.Journey(file), True)
         print(f"Final result : {verification}")
         print("\n" + '-'*100 + "\n")
 
