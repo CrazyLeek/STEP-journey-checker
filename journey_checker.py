@@ -45,7 +45,7 @@ def check_journey(journey:my_util.Journey, verbose=False):
 
     for trip_detected in trips_detected:
         if not trip_detected.has_a_valid_trip():
-            return (False, ), (False, ), trip_detected
+            return (False, ), (False, ), trips_detected
 
     if verbose: print("\n\n--- CHECKING EACH TRIP ---")
     for i, trip_detected in enumerate(trips_detected):
